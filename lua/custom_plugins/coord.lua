@@ -36,6 +36,31 @@ local get_word_jump_list = function(lnum)
     end
 end
 
+local set_extmarks_for_line = function(lnum, line_shortcut)
+    for word_shortcut, col in pairs(M.jump_list[lnum]) do
+        vim.api.nvim_buf_set_extmark(0, ns, lnum - 1, col, {
+            hl_mode = opts.hl_mode or "combine",
+            virt_text = {
+                {
+                    line_shortcut,
+                    "CoordPrimary",
+                },
+                {
+                    word_shortcut,
+                    "CoordSecondary",
+                },
+            },
+            virt_text_pos = "overlay",
+            strict = false,
+            priority = 0,
+        })
+    end
+end
+
+local apply_dim = function()
+    vim.hl.range(0, ns, "CoordDim", "w0", "w$", { priority = 500 })
+end
+
 local jump_col = function(lnum, typed)
     local jump_col = M.jump_list[lnum][typed]
     if jump_col ~= nil then
@@ -46,8 +71,10 @@ end
 
 local jump_line = function(_, typed)
     local jump_lnum = character_list:find(typed, 0, true)
+    apply_dim()
     if jump_lnum ~= nil then
         jump_lnum = vim.fn.line("w0") + jump_lnum - 1
+        set_extmarks_for_line(jump_lnum, typed)
         vim.fn.setcursorcharpos(jump_lnum, 0)
         vim.cmd.redraw()
         local ok, char = pcall(vim.fn.getchar)
@@ -62,7 +89,7 @@ M.start_jump = function()
     local first_shown_lnum = vim.fn.line("w0")
     local last_shown_lnum = vim.fn.line("w$")
     M.jump_list = {}
-    vim.hl.range(0, ns, "CoordDim", { first_shown_lnum, 0 }, { last_shown_lnum, -1 }, { priority = 500 })
+    apply_dim()
     for lnum = first_shown_lnum, last_shown_lnum do
         local char_index = lnum - first_shown_lnum + 1
         if char_index > #character_list then
@@ -71,31 +98,13 @@ M.start_jump = function()
 
         local line_shortcut = character_list:sub(char_index, char_index)
         get_word_jump_list(lnum)
-        for word_shortcut, col in pairs(M.jump_list[lnum]) do
-            vim.api.nvim_buf_set_extmark(0, ns, lnum - 1, col, {
-                hl_mode = opts.hl_mode or "combine",
-                virt_text = {
-                    {
-                        line_shortcut,
-                        "CoordPrimary",
-                    },
-                    {
-                        word_shortcut,
-                        "CoordSecondary",
-                    },
-                },
-                virt_text_pos = "overlay",
-                strict = false,
-                priority = 0,
-            })
-        end
+        set_extmarks_for_line(lnum, line_shortcut)
     end
     vim.cmd.redraw()
     local ok, char = pcall(vim.fn.getchar)
+    vim.api.nvim_buf_clear_namespace(0, ns, 0, -1)
     if ok and type(char) == "number" then
         jump_line("", vim.fn.nr2char(char))
-    else
-        vim.api.nvim_buf_clear_namespace(0, ns, 0, -1)
     end
 end
 
