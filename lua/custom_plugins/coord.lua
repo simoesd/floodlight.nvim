@@ -28,6 +28,9 @@ local get_word_jump_list = function(lnum)
         -- For example, the marks "aa" and "ab" could be drawn as "aab" and "aaab" without this check
         if next_word - prev_mark > 2 then
             local jump_char = character_list:sub(i, i)
+            if i > #character_list then
+                break
+            end
             -- Extmark and cursor repositioning are 0 indexed, while character positions are 1 indexed
             M.jump_list[lnum][jump_char] = next_word - 1
             prev_mark = next_word
