@@ -42,7 +42,7 @@ end
 local set_extmarks_for_line = function(lnum, line_shortcut)
     for word_shortcut, col in pairs(M.jump_list[lnum]) do
         vim.api.nvim_buf_set_extmark(0, ns, lnum - 1, col, {
-            hl_mode = opts.hl_mode or "combine",
+            hl_mode = "combine",
             virt_text = {
                 {
                     line_shortcut,
