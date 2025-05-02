@@ -111,4 +111,8 @@ M.start_jump = function()
     end
 end
 
+vim.api.nvim_create_user_command("CoordJump", function()
+    M.start_jump()
+end, {})
+
 return M
