@@ -2,11 +2,11 @@ local base_colors = require("base_colors")
 local spider_motion = require("spider.motion-logic")
 local spider_config = require("spider.config").globalOpts
 
-vim.api.nvim_set_hl(0, "CoordDim", { fg = base_colors.comment })
-vim.api.nvim_set_hl(0, "CoordPrimary", { fg = base_colors.orange })
-vim.api.nvim_set_hl(0, "CoordSecondary", { fg = base_colors.magenta })
+vim.api.nvim_set_hl(0, "FloodlightDim", { fg = base_colors.comment })
+vim.api.nvim_set_hl(0, "FloodlightPrimary", { fg = base_colors.orange })
+vim.api.nvim_set_hl(0, "FloodlightSecondary", { fg = base_colors.magenta })
 
-local ns = vim.api.nvim_create_namespace("coord")
+local ns = vim.api.nvim_create_namespace("floodlight")
 vim.api.nvim_buf_clear_namespace(0, ns, 0, -1)
 local character_list = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
 local M = {}
@@ -46,11 +46,11 @@ local set_extmarks_for_line = function(lnum, line_shortcut)
             virt_text = {
                 {
                     line_shortcut,
-                    "CoordPrimary",
+                    "FloodlightPrimary",
                 },
                 {
                     word_shortcut,
-                    "CoordSecondary",
+                    "FloodlightSecondary",
                 },
             },
             virt_text_pos = "overlay",
@@ -61,7 +61,7 @@ local set_extmarks_for_line = function(lnum, line_shortcut)
 end
 
 local apply_dim = function()
-    vim.hl.range(0, ns, "CoordDim", "w0", "w$", { priority = 500 })
+    vim.hl.range(0, ns, "FloodlightDim", "w0", "w$", { priority = 500 })
 end
 
 local jump_col = function(lnum, typed)
@@ -111,7 +111,7 @@ M.start_jump = function()
     end
 end
 
-vim.api.nvim_create_user_command("CoordJump", function()
+vim.api.nvim_create_user_command("FloodlightJump", function()
     M.start_jump()
 end, {})
 
