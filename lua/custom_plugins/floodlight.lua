@@ -4,7 +4,7 @@ local spider_config = require("spider.config").globalOpts
 
 vim.api.nvim_set_hl(0, "FloodlightDim", { fg = base_colors.comment })
 vim.api.nvim_set_hl(0, "FloodlightPrimary", { fg = base_colors.orange })
-vim.api.nvim_set_hl(0, "FloodlightSecondary", { fg = base_colors.magenta })
+vim.api.nvim_set_hl(0, "FloodlightSecondary", { fg = base_colors.blue })
 
 local ns = vim.api.nvim_create_namespace("floodlight")
 vim.api.nvim_buf_clear_namespace(0, ns, 0, -1)
