@@ -8,7 +8,7 @@ vim.api.nvim_set_hl(0, "FloodlightSecondary", { fg = base_colors.blue })
 
 local ns = vim.api.nvim_create_namespace("floodlight")
 vim.api.nvim_buf_clear_namespace(0, ns, 0, -1)
-local character_list = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
+local character_list = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ[](){}<>"
 local M = {}
 M.jump_list = {}
 
@@ -61,7 +61,7 @@ local set_extmarks_for_line = function(lnum, line_shortcut)
 end
 
 local apply_dim = function()
-    vim.hl.range(0, ns, "FloodlightDim", "w0", "w$", { priority = 500 })
+    vim.hl.range(0, ns, "FloodlightDim", "w0", "$", { priority = 500 })
 end
 
 local jump_col = function(lnum, typed)
