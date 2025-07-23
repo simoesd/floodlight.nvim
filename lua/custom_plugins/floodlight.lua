@@ -20,7 +20,7 @@ local get_word_jump_list = function(lnum)
     local prev_mark = -1000
     while true do
         next_word = spider_motion.getNextPosition(line_text, next_word, "w", spider_config)
-        if next_word == nil then
+        if next_word == false then
             break
         end
 
