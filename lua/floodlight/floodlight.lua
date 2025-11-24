@@ -135,8 +135,4 @@ M.start_jump = function()
     end
 end
 
-vim.api.nvim_create_user_command("FloodlightJump", function()
-    M.start_jump()
-end, {})
-
 return M
