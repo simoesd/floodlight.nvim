@@ -1,39 +1,9 @@
-local base_colors = require("base_colors")
-
-vim.api.nvim_set_hl(0, "FloodlightDim", { fg = base_colors.comment })
-vim.api.nvim_set_hl(0, "FloodlightPrimary", { fg = base_colors.orange })
-vim.api.nvim_set_hl(0, "FloodlightSecondary", { fg = base_colors.blue })
-
 local ns = vim.api.nvim_create_namespace("floodlight")
 vim.api.nvim_buf_clear_namespace(0, ns, 0, -1)
-local character_list = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ[](){}<>"
 local M = {}
-M.jump_list = {}
 
-local spider_next = nil
-
-if package.loaded["spider"] then
-    local spider_motion = require("spider.motion-logic")
-    local spider_config = require("spider.config").globalOpts
-    spider_next = function(line_text, start_col)
-        return spider_motion.getNextPosition(line_text, start_col, "w", spider_config)
-    end
-end
-
-local function base_next(line_text, start_col)
-    -- Handles 0 indexing and makes sure we don't get the same position multiple times
-    start_col = start_col + 1
-    -- The pattern we use never matches the first character, so we explicitly include it
-    if start_col == 1 then
-        return start_col
-    end
-    local next_pos = vim.fn.matchstrpos(line_text, "\\%" .. start_col .. "v.\\{-}\\<.")[3]
-    if next_pos == -1 or next_pos == start_col or next_pos >= vim.fn.strcharlen(line_text) then
-        return false
-    else
-        return next_pos
-    end
-end
+M.character_list = ""
+M.word_split_callback = nil
 
 local get_word_jump_list = function(lnum)
     local line_text = vim.fn.getline(lnum)
@@ -43,7 +13,7 @@ local get_word_jump_list = function(lnum)
     local i = 1
     local prev_mark = -1000
     while true do
-        next_word = spider_next(line_text, next_word)
+        next_word = M.word_split_callback(line_text, next_word)
         if next_word == false then
             break
         end
@@ -51,8 +21,8 @@ local get_word_jump_list = function(lnum)
         -- If the marks are too close together we skip them, to avoid confusion when they overlap or are directly next to eachother.
         -- For example, the marks "aa" and "ab" could be drawn as "aab" and "aaab" without this check
         if next_word - prev_mark > 2 then
-            local jump_char = character_list:sub(i, i)
-            if i > #character_list then
+            local jump_char = M.character_list:sub(i, i)
+            if i > #M.character_list then
                 break
             end
             -- Extmark and cursor repositioning are 0 indexed, while character positions are 1 indexed
@@ -97,7 +67,7 @@ local jump_col = function(lnum, typed)
 end
 
 local jump_line = function(_, typed)
-    local jump_lnum = character_list:find(typed, 0, true)
+    local jump_lnum = M.character_list:find(typed, 0, true)
     apply_dim()
     if jump_lnum ~= nil then
         jump_lnum = vim.fn.line("w0") + jump_lnum - 1
@@ -119,11 +89,11 @@ M.start_jump = function()
     apply_dim()
     for lnum = first_shown_lnum, last_shown_lnum do
         local char_index = lnum - first_shown_lnum + 1
-        if char_index > #character_list then
+        if char_index > #M.character_list then
             break
         end
 
-        local line_shortcut = character_list:sub(char_index, char_index)
+        local line_shortcut = M.character_list:sub(char_index, char_index)
         get_word_jump_list(lnum)
         set_extmarks_for_line(lnum, line_shortcut)
     end

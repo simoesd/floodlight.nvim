@@ -14,7 +14,7 @@ local M = {}
 --- @field word_split_callback? WordSplitCallback|"simple"|"spider" Method that defines how jump points within a line. `spider` requires `chrisgrieser/nvim-spider` and should follow it's configured `w` behavior, while `base` attempts to closely simulate Neovim's built in "w" behavior.
 
 --- @type FloodlightConfig
-local config = {
+local default_config = {
     colors = {
         dim = { fg = "#5f7096" },
         primary = { fg = "#f79559" },
@@ -24,12 +24,58 @@ local config = {
     word_split_callback = "simple",
 }
 
+local function simple_next(line_text, start_col)
+    -- Handles 0 indexing and makes sure we don't get the same position multiple times
+    start_col = start_col + 1
+    -- The pattern we use never matches the first character, so we explicitly include it
+    if start_col == 1 then
+        return start_col
+    end
+    local next_pos = vim.fn.matchstrpos(line_text, "\\%" .. start_col .. "v.\\{-}\\<.")[3]
+    if next_pos == -1 or next_pos == start_col or next_pos >= vim.fn.strcharlen(line_text) then
+        return false
+    else
+        return next_pos
+    end
+end
+
+local function resolve_word_split_callback(config)
+    if type(config) == "function" then
+        return config
+    else
+        if type(config) == "string" and config == "spider" then
+            if package.loaded["spider"] then
+                local spider_motion = require("spider.motion-logic")
+                local spider_config = require("spider.config").globalOpts
+                local spider_next = function(line_text, start_col)
+                    return spider_motion.getNextPosition(line_text, start_col, "w", spider_config)
+                end
+                return spider_next
+            else
+                vim.notify(
+                    "Floodlight was setup to use `nvim-spider` integration, but spider is not loaded. Defaulting to the `simple` setting.",
+                    vim.log.levels.WARN
+                )
+            end
+        end
+    end
+    return simple_next
+end
+
 --- @param opts? FloodlightConfig
 function M.setup(opts)
-    config = vim.tbl_deep_extend("force", config, opts or {})
+    local config = vim.tbl_deep_extend("force", default_config, opts or {})
+
+    vim.api.nvim_set_hl(0, "FloodlightDim", config.colors.dim)
+    vim.api.nvim_set_hl(0, "FloodlightPrimary", config.colors.primary)
+    vim.api.nvim_set_hl(0, "FloodlightSecondary", config.colors.secondary)
+
+    local floodlight = require("floodlight.floodlight")
+    floodlight.character_list = config.character_list
+    floodlight.word_split_callback = resolve_word_split_callback(config.word_split_callback)
 
     vim.api.nvim_create_user_command("FloodlightJump", function()
-        require("floodlight.floodlight").start_jump()
+        floodlight.start_jump()
     end, {})
 end
 
