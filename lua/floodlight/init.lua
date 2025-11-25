@@ -74,9 +74,14 @@ function M.setup(opts)
     floodlight.character_list = config.character_list
     floodlight.word_split_callback = resolve_word_split_callback(config.word_split_callback)
 
-    vim.api.nvim_create_user_command("FloodlightJump", function()
-        floodlight.start_jump()
-    end, {})
+    vim.g.floodlight_did_setup = true
 end
+
+vim.api.nvim_create_user_command("FloodlightJump", function()
+    if not vim.g.floodlight_did_setup then
+        M.setup({})
+    end
+    require("floodlight.floodlight").start_jump()
+end, {})
 
 return M
