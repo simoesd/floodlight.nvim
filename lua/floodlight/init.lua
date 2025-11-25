@@ -24,6 +24,7 @@ local default_config = {
     word_split_callback = "simple",
 }
 
+--- @type WordSplitCallback
 local function simple_next(line_text, start_col)
     -- Ensures we don't get the same position multiple times
     start_col = start_col + 1
@@ -39,6 +40,8 @@ local function simple_next(line_text, start_col)
     end
 end
 
+--- @param config WordSplitCallback|"simple"|"spider"
+--- @return WordSplitCallback
 local function resolve_word_split_callback(config)
     if type(config) == "function" then
         return config
