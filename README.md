@@ -2,7 +2,8 @@
 
 Jump to an arbitrary word, anywhere on your screen.
 
-[Video]
+
+https://github.com/user-attachments/assets/4ed5b7cf-889e-45d7-b5e2-12288f6544ad
 
 
 Once you initiate a jump, every line on the screen will be dimmed, and a two letter tag appears at the start of each word.
@@ -17,7 +18,7 @@ The goal is to keep motions predictable and visible as soon as a jump is started
  - Built in integration with [chrisgrieser/nvim-spider](https://github.com/chrisgrieser/nvim-spider), for better camel case, pascal case and special character navigation;
 
 ## Configuration
-Currently, Floodlight has three configuration options:
+Floodlight can be configured by calling `require('floodlight').setup(opts)`, but this is unnecessary unless you want to change some options. Currently, there are three configuration options:
  - `colors`: Which highlight groups to use for non-match (`dim`), start of match (`primary`), and end of match characters (`secondary`);
  - `character_list`: What characters to use when building tags and motion shortcuts. The characters are used in order (first character in this string will be used for the first line on screen, and first word of each line etc.). If you notice lines or words without jump tags, you should add more characters to this string.
  - word_split_callback: Method that determines where on each line tags are placed. By default, a method simulating Neovim's default `w` keybind, as well as one utilizing `nvim-spider` is included
@@ -39,7 +40,10 @@ Currently, Floodlight has three configuration options:
 ```
 
 
-### Default config
+
+
+
+### Default configuration
 ```lua
 local default_config = {
     colors = {
@@ -56,3 +60,4 @@ local default_config = {
  - [flash.nvim](https://github.com/folke/flash.nvim)
  - [leap.nvim](https://github.com/ggandor/leap.nvim)
  - [vim-sneak](https://github.com/justinmk/vim-sneak)
+
