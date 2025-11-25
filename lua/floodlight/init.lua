@@ -25,10 +25,10 @@ local default_config = {
 }
 
 local function simple_next(line_text, start_col)
-    -- Handles 0 indexing and makes sure we don't get the same position multiple times
+    -- Ensures we don't get the same position multiple times
     start_col = start_col + 1
     -- The pattern we use never matches the first character, so we explicitly include it
-    if start_col == 1 then
+    if start_col == 1 and vim.fn.match(line_text.sub(1, 1), "\\s") >= 0 then
         return start_col
     end
     local next_pos = vim.fn.matchstrpos(line_text, "\\%" .. start_col .. "v.\\{-}\\<.")[3]
