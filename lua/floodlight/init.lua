@@ -16,9 +16,9 @@ local M = {}
 --- @type FloodlightConfig
 local default_config = {
     colors = {
-        dim = { fg = "#5f7096" },
-        primary = { fg = "#f79559" },
-        secondary = { fg = "#80a6f0" },
+        dim = { fg = "NvimLightGrey4" },
+        primary = { fg = "NvimLightGreen" },
+        secondary = { fg = "NvimLightCyan" },
     },
     character_list = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ[](){}<>",
     word_split_callback = "simple",
