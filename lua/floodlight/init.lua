@@ -86,11 +86,13 @@ function M.setup(opts)
     vim.g.floodlight_did_setup = true
 end
 
-vim.api.nvim_create_user_command("FloodlightJump", function()
+M.start_jump = function()
     if not vim.g.floodlight_did_setup then
         M.setup({})
     end
     require("floodlight.floodlight").start_jump()
-end, {})
+end
+
+vim.api.nvim_create_user_command("FloodlightJump", M.start_jump, {})
 
 return M
