@@ -11,7 +11,7 @@ local M = {}
 --- @class FloodlightConfig
 --- @field colors? Colors Highlight groups to be used
 --- @field character_list? string List of characters to use as tags for each possible jump point
---- @field word_split_callback? WordSplitCallback|"simple"|"spider" Method that defines how jump points within a line. `spider` requires `chrisgrieser/nvim-spider` and should follow it's configured `w` behavior, while `base` attempts to closely simulate Neovim's built in "w" behavior.
+--- @field word_split_callback? WordSplitCallback|"simple"|"spider"|"omnicase" Method that defines how jump points within a line. `spider` requires `chrisgrieser/nvim-spider` and should follow it's configured `w` behavior, while `base` attempts to closely simulate Neovim's built in "w" behavior. `omnicase` requires `simoesd/omnicase.nvim`
 
 --- @type FloodlightConfig
 local default_config = {
@@ -40,23 +40,29 @@ local function simple_next(line_text, start_col)
     end
 end
 
---- @param config WordSplitCallback|"simple"|"spider"
+--- @param config WordSplitCallback|"simple"|"spider"|"omnicase"
 --- @return WordSplitCallback
 local function resolve_word_split_callback(config)
     if type(config) == "function" then
         return config
     else
-        if type(config) == "string" and config == "spider" then
-            if package.loaded["spider"] then
+        if type(config) == "string" then
+            if config == "spider" and package.loaded["spider"] then
                 local spider_motion = require("spider.motion-logic")
                 local spider_config = require("spider.config").globalOpts
-                local spider_next = function(line_text, start_col)
+
+                return function(line_text, start_col)
                     return spider_motion.getNextPosition(line_text, start_col, "w", spider_config)
                 end
-                return spider_next
-            else
+            elseif config == "omnicase" and package.loaded["omnicase"] then
+                return function(line_text, start_col)
+                    return require("omnicase").find_next_word(line_text, start_col, "w")
+                end
+            elseif config ~= "simple" then
                 vim.notify(
-                    "Floodlight was setup to use `nvim-spider` integration, but spider is not loaded. Defaulting to the `simple` setting.",
+                    "Floodlight was setup to use `"
+                        .. config
+                        .. "` integration, but it is not loaded. Defaulting to the `simple` setting.",
                     vim.log.levels.WARN
                 )
             end
