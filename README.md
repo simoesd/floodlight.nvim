@@ -15,13 +15,13 @@ The goal is to keep motions predictable and visible as soon as a jump is started
  - Full screen navigation with a single shortcut, whether the destination is before or after the cursor;
  - Predictable 2 key motions. The first visible line on the screen will always start with the same key, and so will the first word of each line;
  - Configurable word detection, tag characters and highlight options;
- - Built in integration with [chrisgrieser/nvim-spider](https://github.com/chrisgrieser/nvim-spider), for better camel case, pascal case and special character navigation;
+ - Built in integration with [chrisgrieser/nvim-spider](https://github.com/chrisgrieser/nvim-spider) and [simoesd/omnicase.nvim](https://github.com/simoed/omnicase.nvim), for better camel case, pascal case and special character navigation;
 
 ## Configuration
 Floodlight can be configured by calling `require('floodlight').setup(opts)`, but this is unnecessary unless you want to change some options. Currently, there are three configuration options:
  - `colors`: Which highlight groups to use for non-match (`dim`), start of match (`primary`), and end of match characters (`secondary`);
  - `character_list`: What characters to use when building tags and motion shortcuts. The characters are used in order (first character in this string will be used for the first line on screen, and first word of each line etc.). If you notice lines or words without jump tags, you should add more characters to this string.
- - word_split_callback: Method that determines where on each line tags are placed. By default, a method simulating Neovim's default `w` keybind, as well as one utilizing `nvim-spider` is included
+ - word_split_callback: Method that determines where on each line tags are placed. By default, a method simulating Neovim's default `w` keybind, as well as versions utilizing `nvim-spider` and `omnicase` are included
 
 ### Configuration types
 ```lua
@@ -36,12 +36,8 @@ Floodlight can be configured by calling `require('floodlight').setup(opts)`, but
 --- @class FloodlightConfig
 --- @field colors? Colors Highlight groups to be used
 --- @field character_list? string List of characters to use as tags for each possible jump point
---- @field word_split_callback? WordSplitCallback|"simple"|"spider" Method that defines how jump points within a line. `spider` requires `chrisgrieser/nvim-spider` and should follow it's configured `w` behavior, while `base` attempts to closely simulate Neovim's built in "w" behavior.
+--- @field word_split_callback? WordSplitCallback|"simple"|"spider"|"omnicase" Method that defines how jump points within a line. `spider` requires `chrisgrieser/nvim-spider` and should follow it's configured `w` behavior, while `base` attempts to closely simulate Neovim's built in "w" behavior. `omnicase` requires `simoesd/omnicase.nvim`
 ```
-
-
-
-
 
 ### Default configuration
 ```lua
